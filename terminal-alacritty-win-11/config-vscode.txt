@@ -1,13 +1,16 @@
 "terminal.integrated.profiles.windows": {
+    "Alacritty Style": {
+        "path": "pwsh.exe",
+        "args": [
+            "-NoLogo",
+            "-NoExit",
+            "-File",
+            "C:\\Users\\olavo\\AppData\\Roaming\\fastfetch\\pokemon.ps1"
+        ]
+    }
+},
+"terminal.integrated.defaultProfile.windows": "Alacritty Style",
 
-        "Alacritty Style": {
-
-            "path": "pwsh.exe",
-
-            "args": ["-NoLogo", "-NoExit", "-Command", "Set-Location C:\\Users\\olavo; & C:\\Users\\olavo\\AppData\\Roaming\\fastfetch\\pokemon.ps1"]
-
-        }
-
-    },
-
-    "terminal.integrated.defaultProfile.windows": "Alacritty Style" 
+"terminal.integrated.env.windows": {
+    "PATH": "C:\\Program Files\\Git\\cmd;${env:PATH}"
+}
