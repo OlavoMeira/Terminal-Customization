@@ -2,14 +2,21 @@
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
     "type": "iterm",
-    "source": "C:\\Users\\olavo\\AppData\\Local\\Temp\\pokemon_hd.png",
+    "source": "C:\\\\Users\\\\olavo\\\\AppData\\\\Local\\\\Temp\\\\pokemon_hd.png",
     "width": 28,
-    "height": 14
+    "height": 12,
+    "padding": {
+      "top": 2
+    }
   },
   "display": {
     "separator": " "
   },
   "modules": [
+    {
+      "type": "custom",
+      "format": ""
+    },
     {
       "key": "╭───────────╮",
       "type": "custom"
@@ -20,12 +27,12 @@
       "format": "{user-name}"
     },
     {
-      "key": "│ {#32}💻 name   {#keys} │",
+      "key": "│ {#32}💻 name   {#keys}│",
       "type": "title",
       "format": "{host-name}"
     },
     {
-      "key": "│ {#34}🕒 uptime {#keys} │",
+      "key": "│ {#34}🕒 uptime {#keys}│",
       "type": "uptime"
     },
     {
@@ -33,25 +40,25 @@
       "type": "custom"
     },
     {
-      "key": "│ {#32}🪟 distro {#keys} │",
+      "key": "│ {#32}🪟 distro {#keys}│",
       "type": "os"
     },
     {
-      "key": "│ {#32}🪟 kernel {#keys} │",
+      "key": "│ {#32}🪟 kernel {#keys}│",
       "type": "kernel"
     },
     {
-      "key": "│ {#33}⚙️ bootmgr{#keys} │",
+      "key": "│ {#33}⚙️ bootmgr{#keys}│",
       "type": "bootmgr",
       "format": "{name}"
     },
     {
-      "key": "│ {#33}⚙️ init   {#keys} │",
+      "key": "│ {#33}⚙️ init  {#keys}│",
       "type": "initsystem",
       "format": "{name}"
     },
     {
-      "key": "│ {#35}📦 pkgs   {#keys} │",
+      "key": "│ {#35}📦 pkgs  {#keys} │",
       "type": "packages"
     },
     {
@@ -59,15 +66,15 @@
       "type": "custom"
     },
     {
-      "key": "│ {#36}🖥️ desktop{#keys} │",
+      "key": "│ {#36}🖥️ desktop {#keys}│",
       "type": "wm"
     },
     {
-      "key": "│ {#32}🐚 shell  {#keys} │",
+      "key": "│ {#32}🐚 shell {#keys} │",
       "type": "shell"
     },
     {
-      "key": "│ {#34}📟 term   {#keys} │",
+      "key": "│ {#34}📟 term  {#keys} │",
       "type": "terminal"
     },
     {
@@ -75,7 +82,7 @@
       "type": "custom"
     },
     {
-      "key": "│ {#33}Processor {#keys} │",
+      "key": "│ {#33}Processor {#keys}│",
       "type": "cpu"
     },
     {
@@ -84,20 +91,20 @@
       "showPeCoreCount": true
     },
     {
-      "key": "│ {#36}🖥️ monitor{#keys} │",
+      "key": "│ {#36}🖥️ monitor {#keys}│",
       "type": "display"
     },
     {
-      "key": "│ {#36}💾 memory {#keys} │",
+      "key": "│ {#36}💾 memory {#keys}│",
       "type": "memory"
     },
     {
-      "key": "│ {#32}💽 root   {#keys} │",
+      "key": "│ {#32}💽 root   {#keys}│",
       "type": "disk",
       "folders": "/"
     },
     {
-      "key": "│ {#33}🏠 home   {#keys} │",
+      "key": "│ {#33}🏠 home    {#keys}│",
       "type": "disk",
       "folders": "/home"
     },
