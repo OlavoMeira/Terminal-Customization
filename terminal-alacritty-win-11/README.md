@@ -1,71 +1,167 @@
-# Projeto: Pokémon Aleatório no Fastfetch com Alacritty (Windows 11)
+# Guia de Configuração: Do Windows 11 Limpo ao Terminal Perfeito
 
-Este projeto visa configurar o `fastfetch` para exibir um Pokémon aleatório em ASCII toda vez que um novo terminal Alacritty for aberto no Windows 11, utilizando o PowerShell 7.
+Este guia vai transformar um Windows recém-instalado no setup com WezTerm e VS Code totalmente customizados, com ícones, fontes corrigidas, ligaduras ativas e um Pokémon aleatório no fastfetch.
 
-## Visão Geral
+## 🛠️ Passo 1: O Coração de Tudo — Instalar a Fonte Correta
+O maior erro em sistemas novos é a instalação incorreta da fonte. O VS Code exige que ela seja registrada globalmente no Windows 11.
 
-A configuração padrão do `fastfetch` para exibir imagens pode não funcionar diretamente com o Alacritty no Windows. A solução proposta envolve o uso do `pokemon-colorscripts-py` para gerar a arte ASCII do Pokémon e um script do PowerShell para integrar isso ao `fastfetch`.
+1. Baixe o arquivo compacto oficial da fonte: **JetBrainsMono.zip** (Nerd Fonts).
+2. Extraia o conteúdo do arquivo `.zip` em uma pasta qualquer.
+3. Procure pelo arquivo específico **JetBrainsMonoNerdFont-Regular.ttf** (ou **JetBrainsMonoNF-Regular.ttf**).
+4. **Clique com o botão direito** sobre ele e selecione "**Instalar para todos os usuários**" (ícone de escudo de administrador).
 
-## Pré-requisitos
+⚠️ *Se você apenas der dois cliques e clicar em instalar, o VS Code não conseguirá usar as ligaduras no terminal integrado.*
 
-Certifique-se de ter os seguintes componentes instalados em seu sistema Windows 11:
+---
 
-*   **Python 3:** Necessário para o `pokemon-colorscripts-py`.
-    *   Verifique se o Python está no seu PATH. Caso contrário, instale-o (ex: via [python.org](https://www.python.org/downloads/windows/) ou [Scoop](https://scoop.sh/)).
-*   **pip:** Gerenciador de pacotes do Python (geralmente vem com o Python).
-*   **fastfetch:** Ferramenta de informações do sistema.
-    *   Instale-o seguindo as instruções oficiais do [fastfetch-cli](https://github.com/fastfetch-cli/fastfetch).
-*   **Alacritty:** Emulador de terminal rápido e moderno.
-    *   Instale-o a partir do [GitHub do Alacritty](https://github.com/alacritty/alacritty/releases).
-*   **PowerShell 7 (pwsh):** Versão mais recente do PowerShell.
-    *   Instale-o a partir do [GitHub do PowerShell](https://github.com/PowerShell/PowerShell/releases).
+## 📦 Passo 2: Instalar as Ferramentas pelo Terminal do Windows
+O Windows 11 já vem com o Windows Terminal e o winget (gerenciador de pacotes nativo) instalados. Vamos usá-los para instalar o WezTerm, o VS Code, a versão moderna do PowerShell e o Python (necessário para os scripts do Pokémon).
 
-## Estrutura do Projeto
-
-```
-fastfetch_pokemon_project/
-├── config.jsonc
-├── pokemon.ps1
-├── alacritty.toml
-└── README.md
-```
-
-## Instalação e Configuração
-
-Siga os passos abaixo para configurar seu ambiente:
-
-### Passo 1: Instalar `pokemon-colorscripts-py`
-
-Abra o PowerShell 7 e execute o seguinte comando para instalar a biblioteca Python:
+1. Clique no Menu Iniciar, digite **Terminal**, clique com o botão direito nele e escolha **Executar como Administrador**.
+2. Cole e execute o comando abaixo para instalar tudo de uma vez:
 
 ```powershell
-pip install pokemon-colorscripts-py
+winget install --id=Wez.WezTerm -e ; winget install --id=Microsoft.VisualStudioCode -e ; winget install --id=Microsoft.PowerShell -e ; winget install --id=Python.Python.3 -e
 ```
 
-Para testar se a instalação foi bem-sucedida, execute:
+3. **Feche o terminal e reinicie o computador (ou faça Logoff)** após a conclusão para que as variáveis de ambiente do Python e dos novos terminais sejam registradas no sistema.
+
+---
+
+## 🎨 Passo 3: Configurando o WezTerm do Zero
+Como o sistema é novo, a pasta de configurações do WezTerm ainda não existe. Vamos criá-la.
+
+1. Pressione as teclas **Win + R**, digite **%USERPROFILE%** e dê Enter. Isso abrirá a pasta do seu usuário.
+2. Crie um novo arquivo de texto nessa pasta e renomeie-o exatamente para **.wezterm.lua** (certifique-se de apagar o `.txt` do final).
+3. Abra o arquivo **.wezterm.lua** com o Bloco de Notas e cole a estrutura abaixo:
+
+```lua
+local wezterm = require 'wezterm'
+local config = {}
+
+if wezterm.config_builder then
+  config = wezterm.config_builder()
+end
+
+-- --- ESTILIZAÇÃO E PERFORMANCE ---
+config.font = wezterm.font('JetBrainsMono NF')
+config.font_size = 11.0
+config.harfbuzz_features = { 'liga=1', 'calt=1' } -- Garante ligaduras de código ativas
+
+-- Mantém a barra superior nativa ativa para fechar (X), minimizar e redimensionar
+config.window_decorations = "TITLE | RESIZE"
+
+-- --- IMAGEM DE FUNDO (Altere para o caminho da sua imagem) ---
+config.window_background_image = "C:\\Users\\olavo\\Pictures\\Wallpaper\\wallpaper-static\\image.png"
+
+config.window_background_image_hsb = {
+  -- Brilho (brightness): Controla a escuridão da imagem para dar contraste com as letras
+  brightness = 0.15,
+  -- Saturação (saturation): Mantém o balanço das cores do wallpaper
+  saturation = 0.8,
+}
+
+-- --- PROFILE AUTOMÁTICO DO POWERSHELL ---
+config.default_prog = { 
+  'pwsh.exe', 
+  '-NoLogo', 
+  '-NoExit', 
+  '-Command', 
+  'Set-Location C:\Users\olavo; & C:\Users\olavo\AppData\Roaming\fastfetch\pokemon.ps1' 
+}
+
+return config
+```
+4. Salve e feche o arquivo.
+
+---
+
+## 💻 Passo 4: Configurando o Terminal Embutido do VS Code
+Com o motor moderno do VS Code, precisamos usar as chaves explícitas para impedir que ele tente emular ligaduras usando imagens parciais.
+
+1. Abra o VS Code.
+2. Pressione **Ctrl + Shift + P** para abrir a Paleta de Comandos.
+3. Digite: **Preferences: Open User Settings (JSON)** e pressione Enter.
+4. Apague tudo o que estiver no arquivo aberto e cole a nossa estrutura cirúrgica e sem duplicidades:
+
+```json
+{
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "Min Dark",
+  "editor.wordWrap": "on",
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'JetBrains Mono'",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 18,
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": false,
+  "explorer.compactFolders": false,
+  "files.autoSave": "afterDelay",
+  
+  // --- MOTOR DO TERMINAL INTEGRADO ---
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.fontFamily": "JetBrainsMono NF",
+  "terminal.integrated.accessibilitySupport": "off",
+  "terminal.integrated.gpuAcceleration": "auto",
+  "terminal.integrated.minimumContrastRatio": 1,
+  "terminal.integrated.letterSpacing": 0,
+  
+  // Correção das linhas cinzas/apagadas: Chaves com pontos atualizadas
+  "terminal.integrated.fontLigatures.enabled": true,
+  "terminal.integrated.fontLigatures.featureSettings": "'liga' on, 'calt' on",
+
+  // Inicialização idêntica ao WezTerm com o script do Pokémon
+  "terminal.integrated.profiles.windows": {
+    "PowerShell Custom": {
+      "path": "pwsh.exe",
+      "args": [
+        "-NoLogo",
+        "-NoExit",
+        "-Command",
+        "Set-Location C:\Users\olavo; & C:\Users\olavo\AppData\Roaming\fastfetch\pokemon.ps1"
+      ]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "PowerShell Custom"
+}
+```
+5. Salve com **Ctrl + S**.
+
+---
+
+## 🦘 Passo 5: Adicionando os Elementos Visuais (Oh My Posh & Fastfetch)
+Para a nova instalação exibir o visual completo (as setas coloridas na linha de comando e o sumário com o Pokémon), instale os utilitários de customização do prompt.
+
+1. Abra o seu recém-instalado WezTerm (ele vai abrir apontando erro no script do Pokémon provisoriamente, ignore).
+2. Instale o Fastfetch, o Oh My Posh e a biblioteca de Pokémons rodando os comandos abaixo:
 
 ```powershell
-pokemon-colorscripts --random
+winget install Fastfetch.Fastfetch ; winget install JanDeDobbeleer.OhMyPosh -e
+pip install pokemon-colorscripts
 ```
 
-Você deverá ver um Pokémon aleatório em ASCII no seu terminal.
+3. Feche o WezTerm e abra-o novamente para carregar todas as ferramentas no sistema.
 
-### Passo 2: Configurar o `fastfetch`
+### Criando a Pasta de Configurações
+No WezTerm, crie a pasta onde as configurações do Fastfetch residem:
+```powershell
+mkdir -Force "$env:APPDATA\fastfetch"
+```
 
-O arquivo `config.jsonc` do `fastfetch` precisa ser modificado para usar o Pokémon gerado como logo. Substitua o conteúdo do seu arquivo `config.jsonc` (geralmente localizado em `%APPDATA%\fastfetch\config.jsonc` ou `%USERPROFILE%\.config\fastfetch\config.jsonc`) pelo conteúdo do arquivo `config.jsonc` fornecido neste projeto. **Lembre-se de substituir `SEU_USUARIO` pelo seu nome de usuário do Windows.**
+### Configuração Personalizada do Fastfetch (JSON)
+Para ter um visual mais estruturado e com ícones no Fastfetch, como uma "caixa" de informações, vamos criar o arquivo de layout JSON.
 
-**`config.jsonc`**
+1. Crie o arquivo `config.json`:
+```powershell
+New-Item -Path "$env:APPDATA\fastfetch\config.json" -ItemType File -Force
+notepad "$env:APPDATA\fastfetch\config.json"
+```
+
+2. Cole o seguinte conteúdo no arquivo `config.json`, salve e feche:
 ```json
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
-    "type": "file-raw",
-    "source": "C:\\Users\\SEU_USUARIO\\AppData\\Local\\Temp\\pokemon.txt",
-    "padding": {
-      "top": 2,
-      "left": 1,
-      "right": 3
-    }
+    "type": "none"
   },
   "display": {
     "separator": " "
@@ -76,17 +172,17 @@ O arquivo `config.jsonc` do `fastfetch` precisa ser modificado para usar o Poké
       "type": "custom"
     },
     {
-      "key": "│ {#31}\uf007 user   {#keys} │",
+      "key": "│ {#31} user    {#keys} │",
       "type": "title",
       "format": "{user-name}"
     },
     {
-      "key": "│ {#32}\uf109 name   {#keys} │",
+      "key": "│ {#32}💻 name    {#keys} │",
       "type": "title",
       "format": "{host-name}"
     },
     {
-      "key": "│ {#34}\uf017 uptime {#keys} │",
+      "key": "│ {#34}🕒 uptime  {#keys} │",
       "type": "uptime"
     },
     {
@@ -94,24 +190,25 @@ O arquivo `config.jsonc` do `fastfetch` precisa ser modificado para usar o Poké
       "type": "custom"
     },
     {
-      "key": "│ {#32}\uf303 distro {#keys} │",
+      "key": "│ {#32}🪟 distro  {#keys} │",
       "type": "os"
     },
     {
-      "key": "│ {#32}\uf17c kernel {#keys} │",
+      "key": "│ {#32}🪟 kernel  {#keys} │",
       "type": "kernel"
     },
     {
-      "key": "│ {#33}\uf013 bootmgr{#keys} │",
+      "key": "│ {#33}⚙️ bootmgr {#keys} │",
       "type": "bootmgr",
       "format": "{name}"
     },
     {
-      "key": "│ {#33}\uf423 init   {#keys} │",
+      "key": "│ {#33}⚙️ init    {#keys} │",
       "type": "initsystem",
       "format": "{name}"
-    },\n    {
-      "key": "│ {#35}\uf487 pkgs   {#keys} │",
+    },
+    {
+      "key": "│ {#35}📦 pkgs    {#keys} │",
       "type": "packages"
     },
     {
@@ -119,15 +216,15 @@ O arquivo `config.jsonc` do `fastfetch` precisa ser modificado para usar o Poké
       "type": "custom"
     },
     {
-      "key": "│ {#36}\uf108 desktop{#keys} │",
+      "key": "│ {#36}🖥️ desktop {#keys} │",
       "type": "wm"
     },
     {
-      "key": "│ {#32}\uf489 shell  {#keys} │",
+      "key": "│ {#32}🐚 shell   {#keys} │",
       "type": "shell"
     },
     {
-      "key": "│ {#34}\uf120 term   {#keys} │",
+      "key": "│ {#34}📟 term    {#keys} │",
       "type": "terminal"
     },
     {
@@ -135,34 +232,26 @@ O arquivo `config.jsonc` do `fastfetch` precisa ser modificado para usar o Poké
       "type": "custom"
     },
     {
-      "key": "│ {#33}\uf4bc cpu    {#keys} │",
+      "key": "│ {#33}Processor  {#keys} │",
       "type": "cpu"
     },
     {
-
-      "key": "│ {#31}󰍛 gpu {#keys}    │",
+      "key": "│ {#31}Graphics   {#keys} │",
       "type": "gpu",
       "showPeCoreCount": true
-
     },
     {
-      "key": "│ {#36}\uf26c monitor{#keys} │",
+      "key": "│ {#36}🖥️ monitor {#keys} │",
       "type": "display"
     },
     {
-      "key": "│ {#36} memory {#keys} │",
+      "key": "│ {#36}💾 memory  {#keys} │",
       "type": "memory"
-
     },
     {
-      "key": "│ {#32}\uf0a0 root   {#keys} │",
+      "key": "│ {#32}💽 root    {#keys} │",
       "type": "disk",
       "folders": "/"
-    },
-    {
-      "key": "│ {#33}\uf015 home   {#keys} │",
-      "type": "disk",
-      "folders": "/home"
     },
     {
       "key": "╰───────────╯",
@@ -172,81 +261,46 @@ O arquivo `config.jsonc` do `fastfetch` precisa ser modificado para usar o Poké
 }
 ```
 
-### Passo 3: Criar o Script PowerShell
+### Configuração do Script Central (Pokémon Aleatório + Oh My Posh)
+Agora, vamos criar o arquivo unificado `pokemon.ps1`. Ele fará o trabalho completo de preparar os caminhos, inicializar o tema visual e selecionar um Pokémon diferente a cada boot.
 
-Crie um arquivo chamado `pokemon.ps1` (ou qualquer nome de sua preferência) em um local de fácil acesso (ex: `C:\Users\SEU_USUARIO\Documents\Scripts\pokemon.ps1`) com o seguinte conteúdo:
-
-**`pokemon.ps1`**
+1. Crie o arquivo executável:
 ```powershell
-# Script PowerShell para gerar Pokémon aleatório para o Fastfetch
-# Este script deve ser adicionado ao seu arquivo de perfil do PowerShell ($PROFILE)
-
-# Gera um Pokémon aleatório em ASCII e salva em um arquivo temporário
-# O --no-title remove o nome do Pokémon para que apenas a arte ASCII seja exibida
-pokemon-colorscripts --random --no-title | Out-File "$env:TEMP\pokemon.txt" -Encoding utf8
-
-# Executa o fastfetch, usando o conteúdo do arquivo temporário como logo
-fastfetch --logo-type file-raw --logo "$env:TEMP\pokemon.txt"
+New-Item -Path "$env:APPDATA\fastfetch\pokemon.ps1" -ItemType File -Force
+notepad "$env:APPDATA\fastfetch\pokemon.ps1"
 ```
 
-### Passo 4: Atualizar o Perfil do PowerShell
+2. Cole o script avançado abaixo dentro dele, salve e feche:
+```powershell
+# 1. Garante que o sistema localize os binários e dependências de pacotes
+$WinGetPath = "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\Fastfetch-cli.Fastfetch_Microsoft.Winget.Source_8wekyb3d8bbwe"
+$PokemonPath = "C:\Program Files\PokemonColorScripts"
 
-Para que o script `pokemon.ps1` seja executado toda vez que o PowerShell for iniciado, você precisa adicioná-lo ao seu arquivo de perfil do PowerShell (`$PROFILE`).
+if ($env:PATH -notlike "*$WinGetPath*") { $env:PATH += ";$WinGetPath" }
+if ($env:PATH -notlike "*$PokemonPath*") { $env:PATH += ";$PokemonPath" }
 
-1.  Abra o PowerShell 7.
-2.  Digite `notepad $PROFILE` e pressione Enter. Isso abrirá o arquivo de perfil no Bloco de Notas. Se o arquivo não existir, o Bloco de Notas perguntará se você deseja criá-lo.
-3.  Adicione a seguinte linha ao final do arquivo, substituindo o caminho pelo local onde você salvou `pokemon.ps1`:
-
-    ```powershell
-    & "C:\Users\SEU_USUARIO\Documents\Scripts\pokemon.ps1"
-    ```
-
-    (Substitua `C:\Users\SEU_USUARIO\Documents\Scripts\pokemon.ps1` pelo caminho real do seu script).
-4.  Salve e feche o arquivo.
-
-### Passo 5: Configurar o Alacritty
-
-O Alacritty precisa ser configurado para iniciar o PowerShell 7 e carregar seu perfil. Edite seu arquivo `alacritty.toml` (geralmente localizado em `%APPDATA%\alacritty\alacritty.toml` ou `%USERPROFILE%\.config\alacritty\alacritty.toml`) com o conteúdo fornecido neste projeto.
-
-**`alacritty.toml`**
-```toml
-# Configuração básica do Alacritty
-# Este arquivo pode ser personalizado de acordo com suas preferências.
-
-[shell]
-program = "pwsh.exe"
-args = ["-NoExit", "-Command", "& {Import-Module Microsoft.PowerShell.Utility; & $PROFILE}"]
-
-[font]
-normal = {
-    family = "Cascadia Code PL",
-    style = "Regular",
-}
-size = 12
-
-[window]
-padding = {
-    x = 10,
-    y = 10,
+# --- INICIALIZAÇÃO CENTRALIZADA DO OH MY POSH ---
+$themesPath = "C:\Program Files\WindowsApps\ohmyposh.cli_29.16.0.0_x64__96v55e8n804z4\themes"
+if (Test-Path "$themesPath\powerlevel10k_rainbow.omp.json") {
+    oh-my-posh init pwsh --config "$themesPath\powerlevel10k_rainbow.omp.json" | Invoke-Expression
+} else {
+    oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\powerlevel10k_rainbow.omp.json" | Invoke-Expression
 }
 
-# Cores (exemplo, pode ser personalizado)
-[colors]
-primary = {
-    background = '0x1e1e1e',
-    foreground = '0xd4d4d4',
-}
+# --- SCRIPT DE POKÉMON ALEATÓRIO NO FASTFETCH ---
+$list = (pokemon-colorscripts -List 2>&1) | Where-Object { $_ -match '^\w' } | ForEach-Object { $_.Trim() }
+$randomName = $list | Get-Random
+
+$prev = [Console]::OutputEncoding
+[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+$sprite = pokemon-colorscripts -Name $randomName
+[Console]::OutputEncoding = $prev
+
+[System.IO.File]::WriteAllLines("$env:TEMP\pokemon.txt", $sprite, [Text.UTF8Encoding]::new($false))
+fastfetch --config "$env:APPDATA\fastfetch\config.json" --logo "$env:TEMP\pokemon.txt" --logo-type file-raw --logo-width 22 --logo-height 12
 ```
 
-## Solução de Problemas
+---
 
-*   **`pip` não reconhecido:** Se o comando `pip` não for encontrado, certifique-se de que o Python está instalado corretamente e que seu diretório de scripts (ex: `C:\Users\SEU_USUARIO\AppData\Local\Programs\Python\Python3x\Scripts`) foi adicionado à variável de ambiente PATH.
-*   **Pokémon não aparece:** Verifique os caminhos nos arquivos `config.jsonc` e `pokemon.ps1`. Certifique-se de que o `$PROFILE` do PowerShell está sendo carregado corretamente (você pode adicionar um `Write-Host "Perfil carregado!"` temporariamente no `$PROFILE` para verificar).
-*   **Layout incorreto:** Ajuste os valores de `height`, `width` e `padding` na seção `logo` do `config.jsonc` para melhor se adequar ao seu terminal e tamanho de fonte.
-
-## Referências
-
-*   [fastfetch-cli/fastfetch](https://github.com/fastfetch-cli/fastfetch)
-*   [pokemon-colorscripts-py](https://pypi.org/project/pokemon-colorscripts-py/)
-*   [Alacritty](https://github.com/alacritty/alacritty)
-*   [PowerShell](https://github.com/PowerShell/PowerShell)
+## 🧪 O Resultado Esperado
+Feche absolutamente todas as janelas do seu computador. Ao abrir o **WezTerm** ou o terminal integrado do **VS Code** (`Ctrl + '`), o Windows 11 limpo carregará o PowerShell moderno exibindo um Pokémon aleatório em pixel art, os dados da sua máquina dentro de uma caixa estilizada e o prompt do Oh My Posh perfeitamente alinhado. Ao digitar `->` ou `!=`, as ligaduras de código se fundirão imediatamente!
