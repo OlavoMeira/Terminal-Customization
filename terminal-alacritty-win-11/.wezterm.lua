@@ -14,20 +14,22 @@ config.harfbuzz_features = { 'liga=1', 'calt=1' }
 config.window_decorations = "TITLE | RESIZE"
 
 -- --- IMAGEM DE FUNDO ---
-config.window_background_image = "C:\\\\Users\\\\olavo\\\\Pictures\\\\Wallpaper\\\\wallpaper-static\\\\image.png"
+config.window_background_image = "C:\\\\Users\\\\olavo\\\\Pictures\\\\Wallpaper\\\\wallpaper-static\\\\image.jpeg"
 
 config.window_background_image_hsb = {
   brightness = 0.15,
   saturation = 0.8,
 }
 
--- --- PROFILE AUTOMÁTICO DO POWERSHELL ---
+-- --- PROFILE AUTOMÁTICO DO POWERSHELL CORRIGIDO ---
+-- Removemos o Set-Location fixo. Agora ele mantém a pasta onde você clicou 
+-- e roda o script do pokemon logo em seguida.
 config.default_prog = { 
   'pwsh.exe', 
   '-NoLogo', 
   '-NoExit', 
   '-Command', 
-  'Set-Location C:\\Users\\olavo; & C:\\Users\\olavo\\AppData\\Roaming\\fastfetch\\pokemon.ps1' 
+  '& C:\\Users\\olavo\\AppData\\Roaming\\fastfetch\\pokemon.ps1' 
 }
 
 return config
